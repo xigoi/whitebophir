@@ -4,6 +4,11 @@ html, body, svg {
 	font-family: Liberation sans, sans-serif;
 }
 
+foreignObject {
+	overflow: visible;
+	white-space: nowrap;
+}
+
 #canvas {
 	transform-origin: 0 0;
 }
