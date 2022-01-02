@@ -208,6 +208,24 @@ html, body, svg {
     height: 12px;
 }
 
+#menu #pushups {
+	position: relative;
+	user-select: none;
+	pointer-events: auto;
+	white-space: nowrap;
+	list-style-position:inside;
+	border:1px solid #eeeeee;
+	text-decoration:none;
+	cursor:pointer;
+	background: #ffffff;
+	height: 40px;
+	line-height: 40px;
+	border-radius: 0px;
+	width: 40px;
+	box-shadow: inset 0 0 3px #8FA2BC;
+	text-align: center;
+}
+
 input {
 	font-size:16px;
 }

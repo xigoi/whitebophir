@@ -52,7 +52,7 @@ Tools.showMyCursor = true;
 Tools.isIE = /MSIE|Trident/.test(window.navigator.userAgent);
 
 Tools.socket = null;
-Tools.connect = function () {
+Tools.connect = function() {
 	var self = this;
 
 	// Destroy socket if one already exists
@@ -71,7 +71,7 @@ Tools.connect = function () {
 	});
 
 	//Receive draw instructions from the server
-	this.socket.on("broadcast", function (msg) {
+	this.socket.on("broadcast", function(msg) {
 		handleMessage(msg).finally(function afterload() {
 			var loadingEl = document.getElementById("loadingMessage");
 			loadingEl.classList.add("hidden");
@@ -85,7 +85,7 @@ Tools.connect = function () {
 
 Tools.connect();
 
-Tools.boardName = (function () {
+Tools.boardName = (function() {
 	var path = window.location.pathname.split("/");
 	return decodeURIComponent(path[path.length - 1]);
 })();
@@ -100,12 +100,12 @@ function saveBoardNametoLocalStorage() {
 	try {
 		recentBoards = JSON.parse(localStorage.getItem(key));
 		if (!Array.isArray(recentBoards)) throw new Error("Invalid type");
-	} catch(e) {
+	} catch (e) {
 		// On localstorage or json error, reset board list
 		recentBoards = [];
 		console.log("Board history loading error", e);
 	}
-	recentBoards = recentBoards.filter(function (name) {
+	recentBoards = recentBoards.filter(function(name) {
 		return name !== boardName;
 	});
 	recentBoards.unshift(boardName);
@@ -118,21 +118,21 @@ window.addEventListener("pageshow", saveBoardNametoLocalStorage);
 Tools.HTML = {
 	template: new Minitpl("#tools > .tool"),
 	addShortcut: function addShortcut(key, callback) {
-		window.addEventListener("keydown", function (e) {
+		window.addEventListener("keydown", function(e) {
 			if (e.key === key && !e.target.matches("input[type=text], textarea")) {
 				callback();
 			}
 		});
 	},
-	addTool: function (toolName, toolIcon, toolIconHTML, toolShortcut, oneTouch) {
-		var callback = function () {
+	addTool: function(toolName, toolIcon, toolIconHTML, toolShortcut, oneTouch) {
+		var callback = function() {
 			Tools.change(toolName);
 		};
-		this.addShortcut(toolShortcut, function () {
+		this.addShortcut(toolShortcut, function() {
 			Tools.change(toolName);
 			document.activeElement.blur && document.activeElement.blur();
 		});
-		return this.template.add(function (elem) {
+		return this.template.add(function(elem) {
 			elem.addEventListener("click", callback);
 			elem.id = "toolID-" + toolName;
 			elem.getElementsByClassName("tool-name")[0].textContent = Tools.i18n.t(toolName);
@@ -153,13 +153,13 @@ Tools.HTML = {
 			}
 		});
 	},
-	changeTool: function (oldToolName, newToolName) {
+	changeTool: function(oldToolName, newToolName) {
 		var oldTool = document.getElementById("toolID-" + oldToolName);
 		var newTool = document.getElementById("toolID-" + newToolName);
 		if (oldTool) oldTool.classList.remove("curTool");
 		if (newTool) newTool.classList.add("curTool");
 	},
-	toggle: function (toolName, name, icon) {
+	toggle: function(toolName, name, icon) {
 		var elem = document.getElementById("toolID-" + toolName);
 
 		// Change secondary icon
@@ -174,7 +174,7 @@ Tools.HTML = {
 		elem.getElementsByClassName("tool-icon")[0].src = icon;
 		elem.getElementsByClassName("tool-name")[0].textContent = Tools.i18n.t(name);
 	},
-	addStylesheet: function (href) {
+	addStylesheet: function(href) {
 		//Adds a css stylesheet to the html or svg document
 		var link = document.createElement("link");
 		link.href = href;
@@ -183,10 +183,10 @@ Tools.HTML = {
 		document.head.appendChild(link);
 	},
 	colorPresetTemplate: new Minitpl("#colorPresetSel .colorPresetButton"),
-	addColorButton: function (button) {
+	addColorButton: function(button) {
 		var setColor = Tools.setColor.bind(Tools, button.color);
 		if (button.key) this.addShortcut(button.key, setColor);
-		return this.colorPresetTemplate.add(function (elem) {
+		return this.colorPresetTemplate.add(function(elem) {
 			elem.addEventListener("click", setColor);
 			elem.id = "color_" + button.color.replace(/^#/, '');
 			elem.style.backgroundColor = button.color;
@@ -239,7 +239,7 @@ Tools.register = function registerTool(newTool) {
 /**
  * Add a new tool to the user interface
  */
-Tools.add = function (newTool) {
+Tools.add = function(newTool) {
 	if (Tools.isBlocked(newTool)) return;
 
 	Tools.register(newTool);
@@ -252,7 +252,7 @@ Tools.add = function (newTool) {
 	Tools.HTML.addTool(newTool.name, newTool.icon, newTool.iconHTML, newTool.shortcut, newTool.oneTouch);
 };
 
-Tools.change = function (toolName) {
+Tools.change = function(toolName) {
 	var newTool = Tools.list[toolName];
 	var oldTool = Tools.curTool;
 	if (!newTool) throw new Error("Trying to select a tool that has never been added!");
@@ -315,7 +315,7 @@ Tools.removeToolListeners = function removeToolListeners(tool) {
 	}
 };
 
-(function () {
+(function() {
 	// Handle secondary tool switch with shift (key code 16)
 	function handleShift(active, evt) {
 		if (evt.keyCode === 16 && Tools.curTool.secondary && Tools.curTool.secondary.active !== active) {
@@ -326,7 +326,7 @@ Tools.removeToolListeners = function removeToolListeners(tool) {
 	window.addEventListener("keyup", handleShift.bind(null, false));
 })();
 
-Tools.send = function (data, toolName) {
+Tools.send = function(data, toolName) {
 	toolName = toolName || Tools.curTool.name;
 	var d = data;
 	d.tool = toolName;
@@ -338,7 +338,7 @@ Tools.send = function (data, toolName) {
 	Tools.socket.emit('broadcast', message);
 };
 
-Tools.drawAndSend = function (data, tool) {
+Tools.drawAndSend = function(data, tool) {
 	if (tool == null) tool = Tools.curTool;
 	tool.draw(data, true);
 	Tools.send(data, tool.name);
@@ -365,7 +365,7 @@ function messageForTool(message) {
 
 	if (message.tool !== 'Hand' && message.transform != null) {
 		//this message has special info for the mover
-	    messageForTool({ tool: 'Hand', type: 'update', transform: message.transform, id: message.id});
+		messageForTool({ tool: 'Hand', type: 'update', transform: message.transform, id: message.id });
 	}
 }
 
@@ -378,7 +378,7 @@ function batchCall(fn, args) {
 		var batch = args.slice(0, BATCH_SIZE);
 		var rest = args.slice(BATCH_SIZE);
 		return Promise.all(batch.map(fn))
-			.then(function () {
+			.then(function() {
 				return new Promise(requestAnimationFrame);
 			}).then(batchCall.bind(null, fn, rest));
 	}
@@ -396,12 +396,12 @@ function handleMessage(message) {
 }
 
 Tools.unreadMessagesCount = 0;
-Tools.newUnreadMessage = function () {
+Tools.newUnreadMessage = function() {
 	Tools.unreadMessagesCount++;
 	updateDocumentTitle();
 };
 
-window.addEventListener("focus", function () {
+window.addEventListener("focus", function() {
 	Tools.unreadMessagesCount = 0;
 	updateDocumentTitle();
 });
@@ -413,7 +413,7 @@ function updateDocumentTitle() {
 		" | WBO";
 }
 
-(function () {
+(function() {
 	// Scroll and hash handling
 	var scrollTimeout, lastStateUpdate = Date.now();
 
@@ -481,7 +481,7 @@ Tools.setScale = function setScale(scale) {
 	Tools.svg.style.willChange = 'transform';
 	Tools.svg.style.transform = 'scale(' + scale + ')';
 	clearTimeout(scaleTimeout);
-	scaleTimeout = setTimeout(function () {
+	scaleTimeout = setTimeout(function() {
 		Tools.svg.style.willChange = 'auto';
 	}, 1000);
 	Tools.scale = scale;
@@ -499,10 +499,10 @@ Tools.toolHooks = [
 			tool.listeners = {};
 		}
 		if (typeof (tool.onstart) !== "function") {
-			tool.onstart = function () { };
+			tool.onstart = function() { };
 		}
 		if (typeof (tool.onquit) !== "function") {
-			tool.onquit = function () { };
+			tool.onquit = function() { };
 		}
 	},
 	function compileListeners(tool) {
@@ -562,9 +562,9 @@ Tools.toolHooks = [
 	}
 ];
 
-Tools.applyHooks = function (hooks, object) {
+Tools.applyHooks = function(hooks, object) {
 	//Apply every hooks on the object
-	hooks.forEach(function (hook) {
+	hooks.forEach(function(hook) {
 		hook(object);
 	});
 };
@@ -572,7 +572,7 @@ Tools.applyHooks = function (hooks, object) {
 
 // Utility functions
 
-Tools.generateUID = function (prefix, suffix) {
+Tools.generateUID = function(prefix, suffix) {
 	var uid = Date.now().toString(36); //Create the uids in chronological order
 	uid += (Math.round(Math.random() * 36)).toString(36); //Add a random character at the end
 	if (prefix) uid = prefix + uid;
@@ -583,13 +583,13 @@ Tools.generateUID = function (prefix, suffix) {
 Tools.createSVGElement = function createSVGElement(name, attrs) {
 	var elem = document.createElementNS(Tools.svg.namespaceURI, name);
 	if (typeof (attrs) !== "object") return elem;
-	Object.keys(attrs).forEach(function (key, i) {
+	Object.keys(attrs).forEach(function(key, i) {
 		elem.setAttributeNS(null, key, attrs[key]);
 	});
 	return elem;
 };
 
-Tools.positionElement = function (elem, x, y) {
+Tools.positionElement = function(elem, x, y) {
 	elem.style.top = y + "px";
 	elem.style.left = x + "px";
 };
@@ -610,7 +610,7 @@ Tools.colorPresets = [
 
 Tools.color_chooser = document.getElementById("chooseColor");
 
-Tools.setColor = function (color) {
+Tools.setColor = function(color) {
 	Tools.color_chooser.value = color;
 };
 
@@ -618,7 +618,7 @@ Tools.getColor = (function color() {
 	var color_index = (Math.random() * Tools.colorPresets.length) | 0;
 	var initial_color = Tools.colorPresets[color_index].color;
 	Tools.setColor(initial_color);
-	return function () { return Tools.color_chooser.value; };
+	return function() { return Tools.color_chooser.value; };
 })();
 
 Tools.colorPresets.forEach(Tools.HTML.addColorButton.bind(Tools.HTML));
@@ -630,20 +630,20 @@ Tools.setSize = (function size() {
 	function update() {
 		var size = Math.max(1, Math.min(50, chooser.value | 0));
 		chooser.value = size;
-		Tools.sizeChangeHandlers.forEach(function (handler) {
+		Tools.sizeChangeHandlers.forEach(function(handler) {
 			handler(size);
 		});
 	}
 	update();
 
 	chooser.onchange = chooser.oninput = update;
-	return function (value) {
+	return function(value) {
 		if (value !== null && value !== undefined) { chooser.value = value; update(); }
 		return parseInt(chooser.value);
 	};
 })();
 
-Tools.getSize = (function () { return Tools.setSize() });
+Tools.getSize = (function() { return Tools.setSize() });
 
 Tools.getOpacity = (function opacity() {
 	var chooser = document.getElementById("chooseOpacity");
@@ -655,7 +655,7 @@ Tools.getOpacity = (function opacity() {
 	update();
 
 	chooser.onchange = chooser.oninput = update;
-	return function () {
+	return function() {
 		return Math.max(0.1, Math.min(1, chooser.value));
 	};
 })();
@@ -668,40 +668,40 @@ Tools.svg.height.baseVal.value = document.body.clientHeight;
 /**
  What does a "tool" object look like?
  newtool = {
-	  "name" : "SuperTool",
-	  "listeners" : {
+		"name" : "SuperTool",
+		"listeners" : {
 			"press" : function(x,y,evt){...},
 			"move" : function(x,y,evt){...},
 			"release" : function(x,y,evt){...},
-	  },
-	  "draw" : function(data, isLocal){
+		},
+		"draw" : function(data, isLocal){
 			//Print the data on Tools.svg
-	  },
-	  "onstart" : function(oldTool){...},
-	  "onquit" : function(newTool){...},
-	  "stylesheet" : "style.css",
+		},
+		"onstart" : function(oldTool){...},
+		"onquit" : function(newTool){...},
+		"stylesheet" : "style.css",
 }
 */
 
 
-(function () {
-    var pos = {top: 0, scroll:0};
-    var menu = document.getElementById("menu");
-    function menu_mousedown(evt) {
-	pos = {
-	    top: menu.scrollTop,
-	    scroll: evt.clientY
+(function() {
+	var pos = { top: 0, scroll: 0 };
+	var menu = document.getElementById("menu");
+	function menu_mousedown(evt) {
+		pos = {
+			top: menu.scrollTop,
+			scroll: evt.clientY
+		}
+		menu.addEventListener("mousemove", menu_mousemove);
+		document.addEventListener("mouseup", menu_mouseup);
 	}
-	menu.addEventListener("mousemove", menu_mousemove);
-	document.addEventListener("mouseup", menu_mouseup);
-    }
-    function menu_mousemove(evt) {
-	var dy = evt.clientY - pos.scroll;
-	menu.scrollTop = pos.top - dy;
-    }
-    function menu_mouseup(evt) {
-	menu.removeEventListener("mousemove", menu_mousemove);
-	document.removeEventListener("mouseup", menu_mouseup);
-    }
-    menu.addEventListener("mousedown", menu_mousedown);
+	function menu_mousemove(evt) {
+		var dy = evt.clientY - pos.scroll;
+		menu.scrollTop = pos.top - dy;
+	}
+	function menu_mouseup(evt) {
+		menu.removeEventListener("mousemove", menu_mousemove);
+		document.removeEventListener("mouseup", menu_mouseup);
+	}
+	menu.addEventListener("mousedown", menu_mousedown);
 })()
