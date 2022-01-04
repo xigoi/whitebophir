@@ -1,7 +1,7 @@
 /**
  *                        WHITEBOPHIR
  *********************************************************
- * @licstart  The following is the entire license notice for the 
+ * @licstart  The following is the entire license notice for the
  *  JavaScript code in this page.
  *
  * Copyright (C) 2013  Ophir LOJKINE
@@ -24,8 +24,10 @@
  * @licend
  */
 
-(function() {
-  const katex = import('https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.mjs').then((module) => module.default);
+(function () {
+  const katex = import(
+    "https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.mjs"
+  ).then((module) => module.default);
 
   var board = Tools.board;
 
@@ -35,20 +37,19 @@
   input.setAttribute("autocomplete", "off");
 
   var curText = {
-    "x": 0,
-    "y": 0,
-    "size": 36,
-    "rawSize": 16,
-    "oldSize": 0,
-    "opacity": 1,
-    "color": "#000",
-    "id": 0,
-    "sentText": "",
-    "lastSending": 0
+    x: 0,
+    y: 0,
+    size: 36,
+    rawSize: 16,
+    oldSize: 0,
+    opacity: 1,
+    color: "#000",
+    id: 0,
+    sentText: "",
+    lastSending: 0,
   };
 
   var active = false;
-
 
   function onStart() {
     curText.oldSize = Tools.getSize();
@@ -85,7 +86,8 @@
     curText.id = elem.id;
     var r = elem.getBoundingClientRect();
     var x = (r.left + document.documentElement.scrollLeft) / Tools.scale;
-    var y = (r.top + r.height + document.documentElement.scrollTop) / Tools.scale;
+    var y =
+      (r.top + r.height + document.documentElement.scrollTop) / Tools.scale;
 
     curText.x = x;
     curText.y = y;
@@ -94,22 +96,26 @@
     curText.opacity = parseFloat(elem.getAttribute("opacity"));
     curText.color = elem.getAttribute("fill");
     startEdit();
-    input.value = elem.querySelector('annotation').textContent;
+    input.value = elem.querySelector("annotation").textContent;
   }
 
   function startEdit() {
     active = true;
     if (!input.parentNode) board.appendChild(input);
     input.value = "";
-    var left = curText.x - document.documentElement.scrollLeft + 'px';
-    var clientW = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+    var left = curText.x - document.documentElement.scrollLeft + "px";
+    var clientW = Math.max(
+      document.documentElement.clientWidth,
+      window.innerWidth || 0
+    );
     var x = curText.x * Tools.scale - document.documentElement.scrollLeft;
     if (x + 250 > clientW) {
-      x = Math.max(60, clientW - 260)
+      x = Math.max(60, clientW - 260);
     }
 
-    input.style.left = x + 'px';
-    input.style.top = curText.y * Tools.scale - document.documentElement.scrollTop + 20 + 'px';
+    input.style.left = x + "px";
+    input.style.top =
+      curText.y * Tools.scale - document.documentElement.scrollTop + 20 + "px";
     input.focus();
     input.addEventListener("keyup", textChangeHandler);
     input.addEventListener("blur", textChangeHandler);
@@ -117,7 +123,11 @@
   }
 
   function stopEdit() {
-    try { input.blur(); } catch (e) { /* Internet Explorer */ }
+    try {
+      input.blur();
+    } catch (e) {
+      /* Internet Explorer */
+    }
     active = false;
     blur();
     curText.id = 0;
@@ -128,15 +138,17 @@
 
   function blur() {
     if (active) return;
-    input.style.top = '-1000px';
+    input.style.top = "-1000px";
   }
 
   function textChangeHandler(evt) {
-    if (evt.which === 13) { // enter
+    if (evt.which === 13) {
+      // enter
       curText.y += 1.5 * curText.size;
       stopEdit();
       startEdit();
-    } else if (evt.which === 27) { // escape
+    } else if (evt.which === 27) {
+      // escape
       stopEdit();
     }
     if (performance.now() - curText.lastSending > 100) {
@@ -145,19 +157,19 @@
         if (curText.id === 0) {
           curText.id = Tools.generateUID("t"); //"t" for text
           Tools.drawAndSend({
-            'type': 'new',
-            'id': curText.id,
-            'color': curText.color,
-            'size': curText.size,
-            'opacity': curText.opacity,
-            'x': curText.x,
-            'y': curText.y
-          })
+            type: "new",
+            id: curText.id,
+            color: curText.color,
+            size: curText.size,
+            opacity: curText.opacity,
+            x: curText.x,
+            y: curText.y,
+          });
         }
         Tools.drawAndSend({
-          'type': "update",
-          'id': curText.id,
-          'txt': input.value.slice(0, 280)
+          type: "update",
+          id: curText.id,
+          txt: input.value.slice(0, 280),
         });
         curText.sentText = input.value;
         curText.lastSending = performance.now();
@@ -178,7 +190,9 @@
         setTimeout(() => {
           var textField = document.getElementById(data.id);
           if (textField === null) {
-            console.error("Text: Hmmm... I received text that belongs to an unknown text field");
+            console.error(
+              "Text: Hmmm... I received text that belongs to an unknown text field"
+            );
             // setTimeout(() => draw(data, isLocal), 0);
             return;
           }
@@ -192,13 +206,13 @@
   }
 
   function updateText(textField, text) {
-    const div = textField.querySelector('div');
+    const div = textField.querySelector("div");
     katex.then((katex) => {
       katex.render(text, div, { throwOnError: false });
-      const katexSpan = div.querySelector("span.katex")
-      const rect = katexSpan.getBoundingClientRect()
-      textField.setAttribute("width", Math.max(20, rect.width))
-      textField.setAttribute("height", Math.max(20, rect.height))
+      const katexSpan = div.querySelector("span.katex");
+      const rect = katexSpan.getBoundingClientRect();
+      textField.setAttribute("width", Math.max(20, rect.width));
+      textField.setAttribute("height", Math.max(20, rect.height));
     });
   }
 
@@ -207,8 +221,8 @@
     elem.id = fieldData.id;
     elem.setAttribute("x", fieldData.x);
     elem.setAttribute("y", fieldData.y);
-    elem.setAttribute("width", '20');
-    elem.setAttribute("height", '20');
+    elem.setAttribute("width", "20");
+    elem.setAttribute("height", "20");
     const div = document.createElement("div");
     div.style["font-size"] = fieldData.size;
     div.style["color"] = fieldData.color;
@@ -217,25 +231,25 @@
       katex.render(fieldData.txt || "", div, { throwOnError: false });
       elem.appendChild(div);
       Tools.drawingArea.appendChild(elem);
-      const katexSpan = div.querySelector("span.katex")
-      const rect = katexSpan.getBoundingClientRect()
-      elem.setAttribute("width", Math.max(20, rect.width))
-      elem.setAttribute("height", Math.max(20, rect.height))
+      const katexSpan = div.querySelector("span.katex");
+      const rect = katexSpan.getBoundingClientRect();
+      elem.setAttribute("width", Math.max(20, rect.width));
+      elem.setAttribute("height", Math.max(20, rect.height));
     });
   }
 
-  Tools.add({ //The new tool
-    "name": "Math",
-    "shortcut": "t",
-    "listeners": {
-      "press": clickHandler,
+  Tools.add({
+    //The new tool
+    name: "Math",
+    shortcut: "t",
+    listeners: {
+      press: clickHandler,
     },
-    "onstart": onStart,
-    "onquit": onQuit,
-    "draw": draw,
-    "stylesheet": "tools/text/text.css",
-    "icon": "tools/math/icon.svg",
-    "mouseCursor": "text"
+    onstart: onStart,
+    onquit: onQuit,
+    draw: draw,
+    stylesheet: "tools/text/text.css",
+    icon: "tools/math/icon.svg",
+    mouseCursor: "text",
   });
-
 })();

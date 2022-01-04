@@ -24,18 +24,22 @@
  * @licend
  */
 
-(function() { //Code isolation
+(function () {
+  //Code isolation
   //Indicates the id of the shape the user is currently drawing or an empty string while the user is not drawing
 
-  const pushups = document.getElementById('pushups');
+  const pushups = document.getElementById("pushups");
 
-  pushups.addEventListener('click', (evt) => {
+  pushups.addEventListener("click", (evt) => {
     evt.preventDefault();
-    Tools.drawAndSend({
-      'type': 'rect',
-      'id': -1,
-      'pushups': +pushups.innerText + (evt.shiftKey ? -10 : 10),
-    }, pushupTool);
+    Tools.drawAndSend(
+      {
+        type: "rect",
+        id: -1,
+        pushups: +pushups.innerText + (evt.shiftKey ? -10 : 10),
+      },
+      pushupTool
+    );
   });
 
   function draw(data) {
@@ -43,17 +47,16 @@
   }
 
   var pushupTool = {
-    "name": "Pushups",
-    "shortcut": "r",
-    "listeners": {
-      "press": () => { },
-      "move": () => { },
-      "release": () => { },
+    name: "Pushups",
+    shortcut: "r",
+    listeners: {
+      press: () => {},
+      move: () => {},
+      release: () => {},
     },
-    "draw": draw,
-    "mouseCursor": "crosshair",
-    "stylesheet": "tools/rect/rect.css"
+    draw: draw,
+    mouseCursor: "crosshair",
+    stylesheet: "tools/rect/rect.css",
   };
   Tools.register(pushupTool);
-
 })(); //End of code isolation
