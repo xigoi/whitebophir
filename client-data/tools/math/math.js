@@ -24,7 +24,9 @@
  * @licend
  */
 
-(function() { //Code isolation
+(function() {
+  const katex = import('https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.mjs').then((module) => module.default);
+
   var board = Tools.board;
 
   var input = document.createElement("input");
@@ -61,8 +63,9 @@
   function clickHandler(x, y, evt, isTouchEvent) {
     //if(document.querySelector("#menu").offsetWidth>Tools.menu_width+3) return;
     if (evt.target === input) return;
-    if (evt.target.tagName === "foreignObject") {
-      editOldText(evt.target);
+    const elem = evt.target.closest("foreignObject");
+    if (elem) {
+      editOldText(elem);
       evt.preventDefault();
       return;
     }
@@ -172,12 +175,15 @@
         createTextField(data);
         break;
       case "update":
-        var textField = document.getElementById(data.id);
-        if (textField === null) {
-          console.error("Text: Hmmm... I received text that belongs to an unknown text field");
-          return false;
-        }
-        updateText(textField, data.txt);
+        setTimeout(() => {
+          var textField = document.getElementById(data.id);
+          if (textField === null) {
+            console.error("Text: Hmmm... I received text that belongs to an unknown text field");
+            // setTimeout(() => draw(data, isLocal), 0);
+            return;
+          }
+          updateText(textField, data.txt);
+        }, 0);
         break;
       default:
         console.error("Text: Draw instruction with unknown type. ", data);
@@ -187,7 +193,13 @@
 
   function updateText(textField, text) {
     const div = textField.querySelector('div');
-    katex.render(text, div, { throwOnError: false });
+    katex.then((katex) => {
+      katex.render(text, div, { throwOnError: false });
+      const katexSpan = div.querySelector("span.katex")
+      const rect = katexSpan.getBoundingClientRect()
+      textField.setAttribute("width", Math.max(20, rect.width))
+      textField.setAttribute("height", Math.max(20, rect.height))
+    });
   }
 
   function createTextField(fieldData) {
@@ -195,15 +207,21 @@
     elem.id = fieldData.id;
     elem.setAttribute("x", fieldData.x);
     elem.setAttribute("y", fieldData.y);
-    elem.setAttribute("width", '1');
-    elem.setAttribute("height", '1');
+    elem.setAttribute("width", '20');
+    elem.setAttribute("height", '20');
     const div = document.createElement("div");
-    if (fieldData.txt) {
-      katex.render(fieldData.txt, div, { throwOnError: false });
-    }
-    elem.appendChild(div);
-    Tools.drawingArea.appendChild(elem);
-    return elem;
+    div.style["font-size"] = fieldData.size;
+    div.style["color"] = fieldData.color;
+    // div.style["opacity"] = Math.max(0.1, Math.min(1, fieldData.opacity)) || 1;
+    katex.then((katex) => {
+      katex.render(fieldData.txt || "", div, { throwOnError: false });
+      elem.appendChild(div);
+      Tools.drawingArea.appendChild(elem);
+      const katexSpan = div.querySelector("span.katex")
+      const rect = katexSpan.getBoundingClientRect()
+      elem.setAttribute("width", Math.max(20, rect.width))
+      elem.setAttribute("height", Math.max(20, rect.height))
+    });
   }
 
   Tools.add({ //The new tool
@@ -216,8 +234,8 @@
     "onquit": onQuit,
     "draw": draw,
     "stylesheet": "tools/text/text.css",
-    "icon": "tools/text/icon.svg",
+    "icon": "tools/math/icon.svg",
     "mouseCursor": "text"
   });
 
-})(); //End of code isolation
+})();

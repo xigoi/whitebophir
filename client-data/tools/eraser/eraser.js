@@ -54,6 +54,7 @@
 			target = document.elementFromPoint(touch.clientX, touch.clientY);
 		}
 		if (erasing && target !== Tools.svg && target !== Tools.drawingArea && inDrawingArea(target)) {
+			target = evt.target.closest("foreignObject") || target;
 			msg.id = target.id;
 			Tools.drawAndSend(msg);
 		}
