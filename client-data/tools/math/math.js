@@ -240,7 +240,7 @@
   Tools.add({
     //The new tool
     name: "Math",
-    shortcut: "t",
+    shortcut: "m",
     listeners: {
       press: clickHandler,
     },
