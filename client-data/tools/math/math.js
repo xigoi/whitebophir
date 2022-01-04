@@ -193,10 +193,9 @@
             console.error(
               "Text: Hmmm... I received text that belongs to an unknown text field"
             );
-            // setTimeout(() => draw(data, isLocal), 0);
-            return;
+          } else {
+            updateText(textField, data.txt);
           }
-          updateText(textField, data.txt);
         }, 0);
         break;
       default:
@@ -226,7 +225,7 @@
     const div = document.createElement("div");
     div.style["font-size"] = fieldData.size;
     div.style["color"] = fieldData.color;
-    // div.style["opacity"] = Math.max(0.1, Math.min(1, fieldData.opacity)) || 1;
+    div.style["opacity"] = Math.max(0.1, Math.min(1, fieldData.opacity)) || 1;
     katex.then((katex) => {
       katex.render(fieldData.txt || "", div, { throwOnError: false });
       elem.appendChild(div);
