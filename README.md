@@ -1,5 +1,10 @@
 This is a fork of [WBO](https://wbo.ophir.dev) customized for the purpose of our [math sessions](http://mathsessions.klusik.cz/).
 
+## Added features
+
+- Pushup counter (click to increase by 10, shift-click to decrease by 10)
+- LaTeX math tool
+
 ## Running
 
 First, download the sources:
